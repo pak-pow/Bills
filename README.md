@@ -92,6 +92,13 @@ stellar contract deploy \
 
 ---
 
+## Demo
+
+- **Public repo:** https://github.com/pak-pow/Bills
+
+---
+
 ## License
 
-MIT
+MIT — see [LICENSE](./LICENSE)
+

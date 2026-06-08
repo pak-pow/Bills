@@ -238,11 +238,19 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {bill.shares.map((share, sIdx) => {
                         const nameOnly = share.name.split(" ")[0];
-                        const isUserShare = nameOnly === "Alice"; // In our mockup, Alice is the active wallet
+                        
+                        // Dynamically detect if this share belongs to the connected wallet
+                        const matchingRoommate = roommates.find(
+                          r => r.address.toLowerCase() === walletAddress.toLowerCase() ||
+                               (walletAddress.length > 8 && r.address.toLowerCase().startsWith(walletAddress.substring(0, 8).toLowerCase()))
+                        );
+                        const userRoommateName = matchingRoommate ? matchingRoommate.name : "Alice";
+                        const isUserShare = nameOnly.toLowerCase() === userRoommateName.toLowerCase();
+                        
                         return (
                           <div
                             key={sIdx}
-                            className="p-3 rounded-lg flex flex-col justify-between gap-2 border"
+                            className="p-3 rounded-lg flex flex-col justify-between gap-2 border min-h-[84px] h-full"
                             style={{
                               background: "var(--navy-800)",
                               borderColor: share.status === 'Paid' ? 'rgba(16,185,129,0.15)' : 'rgba(251,191,36,0.08)'
@@ -263,8 +271,8 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
                                 <button
                                   onClick={() => handlePayShare(bill.id, nameOnly, share.amount)}
                                   disabled={loading}
-                                  className="btn-primary py-1 px-3 text-[10px]"
-                                  style={{ borderRadius: "0.25rem" }}
+                                  className="bg-gold hover:bg-gold-hover text-navy-950 font-bold py-1 px-2.5 text-[10px] rounded cursor-pointer transition-all flex items-center justify-center"
+                                  style={{ border: "none" }}
                                 >
                                   Pay Split
                                 </button>
