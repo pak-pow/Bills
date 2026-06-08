@@ -15,6 +15,7 @@ export default function Home() {
   const [network, setNetwork] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [connectError, setConnectError] = useState<string | null>(null);
+  const [currency, setCurrency] = useState<string>("USDC");
 
   const handleConnect = async () => {
     if (walletAddress) {
@@ -30,10 +31,10 @@ export default function Home() {
       const connected = await isConnected();
       console.log("Freighter isConnected result:", connected);
       
-      // Handle both boolean and object return types defensively
+      // Handle both boolean and object return types defensively by casting to any
       const isInstalled = 
-        connected === true || 
-        (connected && typeof connected === "object" && (connected.isConnected === true || (connected as any).isConnected === true));
+        (connected as any) === true || 
+        (connected && typeof connected === "object" && ((connected as any).isConnected === true || (connected as any).isConnected === "true"));
 
       if (!isInstalled) {
         setConnectError("Freighter is not installed. Please install it from freighter.app");
@@ -66,6 +67,8 @@ export default function Home() {
         onConnect={handleConnect}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        currency={currency}
+        setCurrency={setCurrency}
       />
 
       {connectError && (
@@ -83,10 +86,10 @@ export default function Home() {
         <main className="max-w-6xl mx-auto px-6 py-10">
           <div className="fade-in">
             {activeTab === "dashboard" && (
-              <Dashboard walletAddress={walletAddress} network={network} />
+              <Dashboard walletAddress={walletAddress} network={network} currency={currency} />
             )}
             {activeTab === "admin" && (
-              <ManagerPortal walletAddress={walletAddress} />
+              <ManagerPortal walletAddress={walletAddress} currency={currency} />
             )}
           </div>
         </main>

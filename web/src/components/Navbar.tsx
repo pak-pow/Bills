@@ -9,6 +9,8 @@ interface NavbarProps {
   onConnect: () => void;
   activeTab: Tab;
   setActiveTab: (tab: Tab) => void;
+  currency: string;
+  setCurrency: (currency: string) => void;
 }
 
 export default function Navbar({
@@ -17,6 +19,8 @@ export default function Navbar({
   onConnect,
   activeTab,
   setActiveTab,
+  currency,
+  setCurrency,
 }: NavbarProps) {
   return (
     <nav className="border-b" style={{ background: "var(--navy-900)", borderColor: "var(--surface-border)" }}>
@@ -56,6 +60,21 @@ export default function Navbar({
               </button>
             </div>
           )}
+
+          {/* Currency Selector */}
+          <div className="flex items-center gap-1.5 bg-navy-800 border rounded-lg px-2.5 py-1 text-xs text-text-primary font-semibold" style={{ borderColor: "var(--surface-border)" }}>
+            <span className="text-[10px] text-text-secondary uppercase">Asset:</span>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              className="bg-transparent text-gold font-bold focus:outline-none cursor-pointer pr-1"
+              style={{ border: "none", outline: "none" }}
+            >
+              <option value="USDC" className="bg-navy-900 text-text-primary font-bold">USDC</option>
+              <option value="PHP" className="bg-navy-900 text-text-primary font-bold">PHP</option>
+              <option value="XLM" className="bg-navy-900 text-text-primary font-bold">XLM</option>
+            </select>
+          </div>
 
           {/* Network Badge */}
           {network && (

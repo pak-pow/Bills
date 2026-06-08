@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PlusCircle, Sliders, CheckCircle2, AlertTriangle, Trash2, RotateCcw } from "lucide-react";
+import { PlusCircle, Sliders, CheckCircle2, AlertTriangle, Trash2, RotateCcw, Users } from "lucide-react";
 
 interface Roommate {
   name: string;
@@ -12,9 +12,10 @@ interface Roommate {
 
 interface ManagerPortalProps {
   walletAddress: string;
+  currency: string;
 }
 
-export default function ManagerPortal({ walletAddress }: ManagerPortalProps) {
+export default function ManagerPortal({ walletAddress, currency }: ManagerPortalProps) {
   const [description, setDescription] = useState<string>("");
   const [totalAmount, setTotalAmount] = useState<string>("");
   const [dueDate, setDueDate] = useState<string>("");
@@ -298,13 +299,13 @@ export default function ManagerPortal({ walletAddress }: ManagerPortalProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-text-secondary uppercase">Total Bill Amount (USDC)</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase">Total Bill Amount ({currency})</label>
                 <input
                   type="number"
                   step="0.01"
                   value={totalAmount}
                   onChange={(e) => setTotalAmount(e.target.value)}
-                  placeholder="Total Amount in USDC"
+                  placeholder={`Total Amount in ${currency}`}
                   className="input-field"
                   required
                 />
@@ -337,7 +338,10 @@ export default function ManagerPortal({ walletAddress }: ManagerPortalProps) {
       <div className="flex flex-col gap-6">
         <div className="card p-6 stat-gradient">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold font-display text-gold">👥 Roommate Directory</h3>
+            <h3 className="text-lg font-bold font-display text-gold flex items-center gap-1.5">
+              <Users className="h-4 w-4" />
+              Roommate Directory
+            </h3>
             <span
               className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                 currentTotalSplit === 100 ? "bg-green/10 text-success border border-green/20" : "bg-danger/10 text-danger border border-danger/20"

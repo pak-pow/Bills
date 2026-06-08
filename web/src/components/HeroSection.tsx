@@ -22,7 +22,7 @@ export default function HeroSection({ onConnect }: HeroSectionProps) {
 
       {/* Description */}
       <p className="text-lg text-text-secondary max-w-2xl leading-relaxed">
-        Automate roommate split calculations on-chain. Pre-fund the household pool in USDC, split utilities or rent automatically, and settle splits programmatically via Soroban smart contracts with zero payment friction.
+        Automate roommate split calculations on-chain. Pre-fund the household pool in USDC, PHP, or XLM, split utilities or rent automatically, and settle splits programmatically via Soroban smart contracts with zero payment friction.
       </p>
 
       {/* Connect Action */}

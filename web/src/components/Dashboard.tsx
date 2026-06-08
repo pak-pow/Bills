@@ -29,16 +29,25 @@ interface Bill {
 interface DashboardProps {
   walletAddress: string;
   network: string | null;
+  currency: string;
 }
 
-export default function Dashboard({ walletAddress, network }: DashboardProps) {
+export default function Dashboard({ walletAddress, network, currency }: DashboardProps) {
   const [bills, setBills] = useState<Bill[]>([]);
   const [roommates, setRoommates] = useState<Roommate[]>([]);
-  const [userBalance, setUserBalance] = useState<string>("250.00");
-  const [contractPoolBalance, setContractPoolBalance] = useState<string>("800.00");
+  const [balances, setBalances] = useState<{
+    [key: string]: { user: string; pool: string };
+  }>({
+    USDC: { user: "250.00", pool: "800.00" },
+    PHP: { user: "12500.00", pool: "40000.00" },
+    XLM: { user: "1500.00", pool: "5000.00" },
+  });
   const [depositAmount, setDepositAmount] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const userBalance = balances[currency]?.user || "0.00";
+  const contractPoolBalance = balances[currency]?.pool || "0.00";
 
   useEffect(() => {
     fetchData();
@@ -67,13 +76,18 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
 
     // Simulate Soroban deposit transaction
     setTimeout(() => {
-      setUserBalance((prev) => (parseFloat(prev) + parseFloat(depositAmount)).toFixed(2));
-      setContractPoolBalance((prev) => (parseFloat(prev) + parseFloat(depositAmount)).toFixed(2));
+      setBalances((prev) => ({
+        ...prev,
+        [currency]: {
+          user: (parseFloat(prev[currency].user) + parseFloat(depositAmount)).toFixed(2),
+          pool: (parseFloat(prev[currency].pool) + parseFloat(depositAmount)).toFixed(2),
+        },
+      }));
       setDepositAmount("");
       setLoading(false);
       setActionMessage({
         type: 'success',
-        text: `Successfully deposited ${depositAmount} USDC into the Palo! Bills contract.`
+        text: `Successfully deposited ${depositAmount} ${currency} into the Palo! Bills contract.`
       });
     }, 1200);
   };
@@ -82,7 +96,7 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
     if (parseFloat(userBalance) < amount) {
       setActionMessage({
         type: 'error',
-        text: `Insufficient pre-funded balance. Please deposit more USDC first.`
+        text: `Insufficient pre-funded balance. Please deposit more ${currency} first.`
       });
       return;
     }
@@ -99,10 +113,16 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
 
       if (res.ok) {
         // Deduct from pre-funded balance
-        setUserBalance((prev) => (parseFloat(prev) - amount).toFixed(2));
+        setBalances((prev) => ({
+          ...prev,
+          [currency]: {
+            ...prev[currency],
+            user: (parseFloat(prev[currency].user) - amount).toFixed(2),
+          },
+        }));
         setActionMessage({
           type: 'success',
-          text: `Paid ${amount} USDC share for ${roommateName}.`
+          text: `Paid ${amount} ${currency} share for ${roommateName}.`
         });
         fetchData();
       } else {
@@ -122,10 +142,10 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
         {/* Balance card */}
         <div className="card p-6 stat-gradient gold-glow">
           <h3 className="text-text-secondary text-sm font-semibold tracking-wide uppercase">Your Pre-funded Balance</h3>
-          <p className="text-4xl font-extrabold text-gold tracking-tight mt-1 font-display">{userBalance} <span className="text-lg text-text-primary">USDC</span></p>
+          <p className="text-4xl font-extrabold text-gold tracking-tight mt-1 font-display">{userBalance} <span className="text-lg text-text-primary">{currency}</span></p>
           <div className="flex justify-between items-center mt-6 pt-4 border-t" style={{ borderColor: "rgba(251,191,36,0.15)" }}>
             <span className="text-xs text-text-secondary">On-chain House Pool Balance:</span>
-            <span className="text-sm font-bold text-text-primary">{contractPoolBalance} USDC</span>
+            <span className="text-sm font-bold text-text-primary">{contractPoolBalance} {currency}</span>
           </div>
         </div>
 
@@ -136,7 +156,7 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
             Pre-Fund Pool
           </h3>
           <p className="text-sm text-text-secondary mb-4">
-            Deposit USDC into the household contract so your split shares are automatically or easily paid when bills are charged.
+            Deposit {currency} into the household contract so your split shares are automatically or easily paid when bills are charged.
           </p>
           <form onSubmit={handleDeposit} className="flex flex-col gap-3">
             <input
@@ -144,12 +164,12 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
               step="0.01"
               value={depositAmount}
               onChange={(e) => setDepositAmount(e.target.value)}
-              placeholder="Amount (USDC)"
+              placeholder={`Amount (${currency})`}
               className="input-field"
               required
             />
             <button type="submit" disabled={loading} className="btn-primary w-full cursor-pointer">
-              {loading ? "Approving Transaction..." : "Deposit USDC"}
+              {loading ? "Approving Transaction..." : `Deposit ${currency}`}
             </button>
           </form>
         </div>
@@ -225,7 +245,7 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
                       <p className="text-xs text-text-secondary mt-0.5">Due date: {bill.dueDate}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-extrabold text-gold">{bill.totalAmount} USDC</p>
+                      <p className="text-xl font-extrabold text-gold">{bill.totalAmount} {currency}</p>
                       <span className={bill.status === 'Paid' ? 'badge-green text-[10px]' : 'badge-yellow text-[10px]'}>
                         {bill.status}
                       </span>
@@ -240,10 +260,13 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
                         const nameOnly = share.name.split(" ")[0];
                         
                         // Dynamically detect if this share belongs to the connected wallet
-                        const matchingRoommate = roommates.find(
-                          r => r.address.toLowerCase() === walletAddress.toLowerCase() ||
-                               (walletAddress.length > 8 && r.address.toLowerCase().startsWith(walletAddress.substring(0, 8).toLowerCase()))
-                        );
+                        const matchingRoommate = roommates.find(r => {
+                          const rAddr = r.address.split(" ")[0].split(".")[0].toLowerCase();
+                          const wAddr = walletAddress.toLowerCase();
+                          return wAddr === rAddr || 
+                                 wAddr.startsWith(rAddr) || 
+                                 (rAddr.length > 5 && wAddr.startsWith(rAddr.substring(0, 7)));
+                        });
                         const userRoommateName = matchingRoommate ? matchingRoommate.name : "Alice";
                         const isUserShare = nameOnly.toLowerCase() === userRoommateName.toLowerCase();
                         
@@ -266,7 +289,7 @@ export default function Dashboard({ walletAddress, network }: DashboardProps) {
                               </span>
                             </div>
                             <div className="flex justify-between items-center pt-2">
-                              <span className="text-sm font-extrabold text-text-primary">{share.amount} USDC</span>
+                              <span className="text-sm font-extrabold text-text-primary">{share.amount} {currency}</span>
                               {!share.status.includes('Paid') && isUserShare && (
                                 <button
                                   onClick={() => handlePayShare(bill.id, nameOnly, share.amount)}

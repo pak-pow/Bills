@@ -113,17 +113,34 @@ app.post('/api/bills', (req, res) => {
     return res.status(400).json({ error: 'Missing required bill fields.' });
   }
 
+  const parsedTotal = parseFloat(totalAmount);
+  let allocatedSum = 0;
+  const shares = [];
+
+  for (let i = 0; i < roommates.length; i++) {
+    const r = roommates[i];
+    let shareAmount;
+    if (i === roommates.length - 1) {
+      // Last roommate absorbs the rounding discrepancy to ensure exact total match
+      shareAmount = parseFloat((parsedTotal - allocatedSum).toFixed(2));
+    } else {
+      shareAmount = parseFloat((parsedTotal * (r.sharePercent / 100)).toFixed(2));
+      allocatedSum += shareAmount;
+    }
+    shares.push({
+      name: `${r.name} (${r.sharePercent}%)`,
+      amount: shareAmount,
+      status: 'Unpaid'
+    });
+  }
+
   const newBill = {
     id: bills.length + 1,
     description,
-    totalAmount: parseFloat(totalAmount),
+    totalAmount: parsedTotal,
     dueDate,
     status: 'Pending',
-    shares: roommates.map(r => ({
-      name: `${r.name} (${r.sharePercent}%)`,
-      amount: parseFloat((totalAmount * (r.sharePercent / 100)).toFixed(2)),
-      status: 'Unpaid'
-    }))
+    shares
   };
 
   bills.unshift(newBill); // Add to the front
