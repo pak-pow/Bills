@@ -1,0 +1,22 @@
+/* Card styles */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  border-color: rgba(251, 191, 36, 0.25);
+  box-shadow: 0 4px 24px rgba(251, 191, 36, 0.08);
+}
+
+/* Gold glow utility */
+.gold-glow {
+  box-shadow: 0 0 20px var(--gold-glow), 0 0 40px rgba(251, 191, 36, 0.05);
+}
+
+/* Stat card gradient */
+.stat-gradient {
+  background: linear-gradient(135deg, var(--navy-700) 0%, var(--navy-800) 100%);
+}

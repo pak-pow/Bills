@@ -1,0 +1,62 @@
+/* Buttons */
+.btn-primary {
+  background: var(--gold-400);
+  color: var(--navy-950);
+  font-weight: 700;
+  border-radius: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  font-size: 0.9375rem;
+}
+
+.btn-primary:hover {
+  background: var(--gold-500);
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--gold-400);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border: 1.5px solid var(--gold-400);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9375rem;
+}
+
+.btn-outline:hover {
+  background: rgba(251, 191, 36, 0.08);
+  transform: translateY(-1px);
+}
+
+.btn-outline:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Tab nav */
+.tab-active {
+  color: var(--gold-400);
+  border-bottom: 2px solid var(--gold-400);
+}
+
+.tab-inactive {
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+}
